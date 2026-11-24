@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#123b32">
+<title>Mi Dinero — Organizador financiero</title>
+<style>
+:root{--green:#176b50;--green2:#dff3e9;--yellow:#f4c84a;--red:#d94b4b;--ink:#20312c;--muted:#718078;--bg:#f4f7f5;--card:#fff;--line:#e5ece8}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px system-ui,-apple-system,Segoe UI,sans-serif}
+header{background:#123b32;color:#fff;padding:22px 18px 26px;border-radius:0 0 24px 24px}
+.top{display:flex;justify-content:space-between;align-items:center;gap:10px}.brand{font-size:21px;font-weight:800}.sub{opacity:.75;font-size:12px;margin-top:3px}
+main{max-width:760px;margin:auto;padding:16px 14px 92px}.balance{margin-top:-8px;background:#fff;border-radius:18px;padding:18px;box-shadow:0 7px 25px #193c2b12}
+.eyebrow{font-size:11px;color:var(--muted);font-weight:700;letter-spacing:.08em;text-transform:uppercase}.amount{font-size:32px;font-weight:800;margin:4px 0 14px}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:10px}.stat{background:#f5f8f6;border-radius:13px;padding:12px}.stat b{display:block;font-size:19px;margin-top:4px}.positive{color:#168052}.negative{color:#bd8a00}
+.actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:14px 0}.btn{border:0;border-radius:12px;padding:13px 12px;font-weight:750;font-size:14px;cursor:pointer}.btn-green{background:var(--green);color:white}.btn-yellow{background:#f6d66f;color:#493b0b}.btn-light{background:#edf3ef;color:#244b3d}
+.section{display:flex;align-items:center;justify-content:space-between;margin:22px 2px 10px}.section h2{font-size:18px;margin:0}.muted{color:var(--muted);font-size:12px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px;margin-bottom:10px}
+.tabs{display:flex;gap:7px;overflow:auto;padding-bottom:3px}.tab{white-space:nowrap;border:1px solid var(--line);background:#fff;padding:9px 12px;border-radius:20px;font-size:12px;font-weight:700;color:#52635b}.tab.active{background:#173f34;color:#fff;border-color:#173f34}
+.monthnav{display:flex;align-items:center;justify-content:space-between;margin:4px 0 12px}.monthnav button{border:0;background:#edf3ef;border-radius:9px;padding:8px 12px;font-size:18px}
+.calendar{display:grid;grid-template-columns:repeat(7,1fr);gap:5px}.weekday{text-align:center;color:var(--muted);font-size:11px;font-weight:700;padding:5px 0}.day{min-height:54px;background:#f7f9f8;border-radius:9px;padding:5px 3px;text-align:center;font-size:12px;border:1px solid transparent}.day.today{border-color:var(--green)}.day .dot{width:7px;height:7px;border-radius:50%;display:inline-block;margin:3px 2px 0}.dot.in{background:#24a36c}.dot.out{background:#edc342}.dot.high{background:#d94b4b}.day .num{font-weight:650}
+.legend{display:flex;gap:13px;flex-wrap:wrap;margin-top:12px;font-size:11px;color:var(--muted)}.legend span{display:flex;align-items:center;gap:5px}
+.item{display:flex;justify-content:space-between;gap:12px;align-items:center}.item-left{display:flex;gap:10px;align-items:center;min-width:0}.symbol{width:38px;height:38px;border-radius:12px;background:#edf5f0;display:grid;place-items:center;font-size:18px}.item-title{font-weight:700}.item-meta{font-size:11px;color:var(--muted);margin-top:2px}.item-amount{font-weight:800;white-space:nowrap}.future{opacity:.43}.priority{color:var(--red);font-size:10px;font-weight:800}
+nav{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid var(--line);display:flex;justify-content:space-around;padding:9px 4px calc(9px + env(safe-area-inset-bottom));z-index:5}
+nav button{border:0;background:none;color:#718078;font-size:10px;font-weight:700;display:grid;gap:3px;justify-items:center;min-width:60px}nav button strong{font-size:19px}nav button.active{color:var(--green)}
+.modal{display:none;position:fixed;inset:0;background:#10251f77;z-index:10;align-items:flex-end;justify-content:center}.modal.show{display:flex}.sheet{background:#fff;width:100%;max-width:650px;max-height:92vh;overflow:auto;border-radius:22px 22px 0 0;padding:20px 17px 30px}.sheet h2{margin:0 0 16px}
+label{display:block;font-size:12px;font-weight:750;margin:12px 0 5px;color:#43554c}input,select{width:100%;border:1px solid #dce6e0;border-radius:10px;padding:12px;font:inherit;background:#fff;color:var(--ink)}input[type=checkbox]{width:auto;accent-color:var(--green)}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}.checks{display:flex;flex-wrap:wrap;gap:8px}.check{background:#f1f5f2;border-radius:9px;padding:8px 10px;font-size:12px}.check input{margin-right:4px}
+.form-actions{display:flex;gap:9px;margin-top:20px}.form-actions button{flex:1}
+.hidden{display:none!important}.empty{text-align:center;color:var(--muted);padding:24px 10px;font-size:13px}
+@media(min-width:650px){.modal{align-items:center}.sheet{border-radius:20px}.day{min-height:70px}.calendar{gap:8px}}
+</style>
+</head>
+<body>
+<header><div class="top"><div><div class="brand">💰 Mi Dinero</div><div class="sub">Tu organizador financiero</div></div><div style="font-size:12px;opacity:.8">VERSIÓN 1.0</div></div></header>
+<main>
+<section id="homeView">
+ <div class="balance">
+  <div class="eyebrow">Balance disponible</div><div class="amount" id="balance">$0.00</div>
+  <div class="stats"><div class="stat"><span class="muted">Ingresos recibidos</span><b class="positive" id="incomeTotal">$0.00</b></div><div class="stat"><span class="muted">Gastos pagados</span><b class="negative" id="expenseTotal">$0.00</b></div></div>
+ </div>
+ <div class="actions"><button class="btn btn-green" onclick="openForm('income')">＋ Agregar ingreso</button><button class="btn btn-yellow" onclick="openForm('expense')">＋ Agregar gasto</button></div>
+ <div class="section"><h2>Próximos movimientos</h2><span class="muted" id="upcomingCount"></span></div>
+ <div id="upcomingList"></div>
+ <div class="section"><h2>Calendario</h2><span class="muted">Vista mensual</span></div>
+ <div class="card"><div class="monthnav"><button onclick="changeMonth(-1)">‹</button><b id="monthLabel"></b><button onclick="changeMonth(1)">›</button></div><div class="calendar" id="calendar"></div><div class="legend"><span><i class="dot in"></i> Ingreso</span><span><i class="dot out"></i> Gasto</span><span><i class="dot high"></i> Prioridad alta</span></div></div>
+ <div class="section"><h2>Movimientos recientes</h2><span class="muted" id="recentCount"></span></div><div id="recentList"></div>
+</section>
+<section id="movesView" class="hidden">
+ <div class="section"><h2>Movimientos</h2><button class="btn btn-light" onclick="openForm('income')">＋ Nuevo</button></div>
+ <div class="tabs" id="moveFilters"><button class="tab active" data-filter="all">Todos</button><button class="tab" data-filter="income">Ingresos</button><button class="tab" data-filter="expense">Gastos</button><button class="tab" data-filter="pending">Pendientes</button></div>
+ <div style="height:12px"></div><div id="allMoves"></div>
+</section>
+<section id="calendarView" class="hidden">
+ <div class="section"><h2>Calendario financiero</h2></div>
+ <div class="card"><div class="monthnav"><button onclick="changeMonth(-1)">‹</button><b id="monthLabel2"></b><button onclick="changeMonth(1)">›</button></div><div class="calendar" id="calendar2"></div><div class="legend"><span><i class="dot in"></i> Ingreso</span><span><i class="dot out"></i> Gasto</span><span><i class="dot high"></i> Prioridad alta</span></div></div>
+ <div class="section"><h2 id="selectedDateTitle">Movimientos del día</h2></div><div id="dayMoves"></div>
+</section>
+<section id="statsView" class="hidden">
+ <div class="section"><h2>Resumen financiero</h2></div>
+ <div class="card"><div class="eyebrow">Este mes · ingresos recibidos</div><div class="amount positive" id="monthIncome">$0.00</div><div class="eyebrow">Este mes · gastos pagados</div><div class="amount negative" id="monthExpense">$0.00</div></div>
+ <div class="card"><b>Distribución de gastos</b><div id="categoryStats" style="margin-top:12px"></div></div>
+ <p class="muted">Las gráficas detalladas se incorporarán en la siguiente mejora.</p>
+</section>
+</main>
+<nav><button class="active" data-view="homeView"><strong>⌂</strong>Inicio</button><button data-view="movesView"><strong>↕</strong>Movimientos</button><button data-view="calendarView"><strong>▦</strong>Calendario</button><button data-view="statsView"><strong>◔</strong>Resumen</button></nav>
+<div class="modal" id="modal"><div class="sheet"><h2 id="formTitle">Nuevo movimiento</h2><form id="movementForm">
+<input type="hidden" id="editId">
+<label>Tipo de movimiento</label><select id="type"><option value="income">Ingreso</option><option value="expense">Gasto</option></select>
+<label>Nombre</label><input id="name" required placeholder="Ej. Sueldo, luz, despensa">
+<div class="row"><div><label>Cantidad ($)</label><input id="amount" type="number" min="0.01" step="0.01" required placeholder="0.00"></div><div><label>Fecha inicial</label><input id="date" type="date" required></div></div>
+<div id="categoryWrap"><label>Categoría</label><select id="category"><option>Servicios del hogar</option><option>Alimentación</option><option>Transporte</option><option>Educación</option><option>Salud</option><option>Gastos personales</option><option>Entretenimiento</option><option>Otros</option></select></div>
+<label>Prioridad</label><select id="priority"><option value="normal">Normal</option><option value="medium">Media</option><option value="high">Alta (rojo)</option></select>
+<label>¿Este movimiento se repetirá automáticamente?</label><select id="recurring"><option value="no">No, es un movimiento único</option><option value="yes">Sí, tiene un ciclo</option></select>
+<div id="cycleFields" class="hidden">
+ <label>Frecuencia</label><select id="frequency"><option value="monthly">Mensual</option><option value="biweekly">Quincenal</option><option value="weekly">Semanal</option><option value="daily">Por días</option></select>
+ <div id="monthlyDays"><label>Días del mes (separa con coma; ejemplo: 1, 15, 28)</label><input id="monthDays" placeholder="1, 28"></div>
+ <div id="weeklyDays" class="hidden"><label>Días de la semana</label><div class="checks" id="weekChecks"></div></div>
+ <div id="dailyDays" class="hidden"><label>Repetir cada cuántos días</label><input id="everyDays" type="number" min="1" value="1"></div>
+ <label>Repetir hasta</label><input id="endDate" type="date">
+</div>
+<label>Estado</label><select id="status"><option value="pending">Pendiente de confirmar</option><option value="done">Ya recibido / pagado</option></select>
+<div class="form-actions"><button type="button" class="btn btn-light" onclick="closeForm()">Cancelar</button><button class="btn btn-green" type="submit">Guardar</button></div>
+</form></div></div>
+<script>
+const $=id=>document.getElementById(id);
+let entries=JSON.parse(localStorage.getItem('midinero_entries')||'[]');
+let viewMonth=new Date();viewMonth.setDate(1);let selectedDate=new Date().toISOString().slice(0,10);let currentFilter='all';
+const money=n=>new Intl.NumberFormat('es-MX',{style:'currency',currency:'MXN'}).format(n||0);
+const today=()=>{let d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`};
+const localISO=d=>`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+const fmt=d=>new Date(d+'T12:00:00').toLocaleDateString('es-MX',{day:'numeric',month:'short',year:'numeric'});
+function save(){localStorage.setItem('midinero_entries',JSON.stringify(entries));render()}
+function occurrenceDates(e){
+ let dates=[];let start=new Date(e.date+'T12:00:00'),end=e.endDate?new Date(e.endDate+'T12:00:00'):new Date(start.getFullYear()+1,start.getMonth(),start.getDate());let max=new Date(start);max.setFullYear(max.getFullYear()+2);if(end>max)end=max;
+ if(!e.recurring||e.frequency==='none')return [e.date];
+ if(e.frequency==='monthly'||e.frequency==='biweekly'){
+  let days=(e.monthDays||[start.getDate()]);let cur=new Date(start.getFullYear(),start.getMonth(),1);
+  while(cur<=end){for(let day of days){let d=new Date(cur.getFullYear(),cur.getMonth(),Math.min(day,new Date(cur.getFullYear(),cur.getMonth()+1,0).getDate()));if(d>=start&&d<=end)dates.push(d.toISOString().slice(0,10))}
+   cur.setMonth(cur.getMonth()+1)}
+ }else if(e.frequency==='weekly'){
+  let wanted=e.weekDays||[start.getDay()];let cur=new Date(start);while(cur<=end){if(wanted.includes(cur.getDay()))dates.push(cur.toISOString().slice(0,10));cur.setDate(cur.getDate()+1)}
+ }else if(e.frequency==='daily'){
+  let cur=new Date(start),step=Math.max(1,+e.everyDays||1);while(cur<=end){dates.push(cur.toISOString().slice(0,10));cur.setDate(cur.getDate()+step)}
+ }
+ return [...new Set(dates)].sort();
+}
+function occurrences(from,to){
+ let out=[];entries.forEach(e=>occurrenceDates(e).forEach(d=>{if(d>=from&&d<=to)out.push({...e,occDate:d,instanceId:e.id+'_'+d,done:e.completedDates?.includes(d)||(!e.recurring&&e.status==='done')})}));return out.sort((a,b)=>a.occDate.localeCompare(b.occDate));
+}
+function render(){
+ let all=occurrences('2000-01-01','2100-12-31'),actual=all.filter(x=>x.done&&x.occDate<=today()),inc=actual.filter(x=>x.type==='income').reduce((s,x)=>s+x.amount,0),exp=actual.filter(x=>x.type==='expense').reduce((s,x)=>s+x.amount,0);
+ $('balance').textContent=money(inc-exp);$('incomeTotal').textContent=money(inc);$('expenseTotal').textContent=money(exp);
+ let future=all.filter(x=>!x.done&&x.occDate>=today()).slice(0,5);$('upcomingCount').textContent=future.length+' próximos';
+ $('upcomingList').innerHTML=future.length?future.map(itemHTML).join(''):'<div class="card empty">Todavía no tienes movimientos próximos. Agrega un ingreso o gasto para comenzar.</div>';
+ let recent=all.filter(x=>x.done).sort((a,b)=>b.occDate.localeCompare(a.occDate)).slice(0,5);$('recentCount').textContent=recent.length+' registrados';$('recentList').innerHTML=recent.length?recent.map(itemHTML).join(''):'<div class="card empty">Aquí aparecerán tus movimientos confirmados.</div>';
+ renderCalendar('calendar');renderCalendar('calendar2');renderMoves();renderDay();renderStats();
+}
+function itemHTML(e){let isIn=e.type==='income',future=!e.done;return `<div class="card ${future?'future':''}"><div class="item"><div class="item-left"><div class="symbol">${isIn?'↗':'↘'}</div><div style="min-width:0"><div class="item-title">${esc(e.name)} ${e.priority==='high'?'<span class="priority">● PRIORIDAD ALTA</span>':''}</div><div class="item-meta">${fmt(e.occDate)} · ${isIn?'Ingreso':esc(e.category||'Gasto')} · ${future?'Pendiente':'Confirmado'}</div></div></div><div style="text-align:right"><div class="item-amount ${isIn?'positive':'negative'}">${isIn?'+':'−'}${money(e.amount)}</div>${future?`<button class="btn btn-light" style="padding:5px 8px;margin-top:5px;font-size:10px" onclick="confirmOccurrence('${e.id}','${e.occDate}')">Confirmar</button>`:`<button class="btn btn-light" style="padding:4px 7px;margin-top:4px;font-size:10px" onclick="editEntry('${e.id}')">Editar</button>`}</div></div></div>`}
+function esc(s){return String(s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function renderCalendar(id){
+ let y=viewMonth.getFullYear(),m=viewMonth.getMonth(),first=new Date(y,m,1),offset=(first.getDay()+6)%7,total=new Date(y,m+1,0).getDate(),from=localISO(new Date(y,m,1)),to=localISO(new Date(y,m,total)),occ=occurrences(from,to);
+ $('monthLabel').textContent=$('monthLabel2').textContent=viewMonth.toLocaleDateString('es-MX',{month:'long',year:'numeric'});
+ let html=['L','M','M','J','V','S','D'].map(d=>`<div class="weekday">${d}</div>`).join('');
+ for(let i=0;i<offset;i++)html+='<div></div>';
+ for(let d=1;d<=total;d++){let date=`${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`,items=occ.filter(x=>x.occDate===date),hasHigh=items.some(x=>x.priority==='high'),hasIn=items.some(x=>x.type==='income'),hasOut=items.some(x=>x.type==='expense');html+=`<div class="day ${date===today()?'today':''}" onclick="selectDay('${date}')"><div class="num">${d}</div><div>${hasHigh?'<i class="dot high"></i>':''}${hasIn?'<i class="dot in"></i>':''}${hasOut?'<i class="dot out"></i>':''}</div></div>`}
+ $(id).innerHTML=html;
+}
+function changeMonth(n){viewMonth.setMonth(viewMonth.getMonth()+n);renderCalendar('calendar');renderCalendar('calendar2');renderDay()}
+function selectDay(d){selectedDate=d;showView('calendarView');renderDay()}
+function renderDay(){let items=occurrences(selectedDate,selectedDate);$('selectedDateTitle').textContent='Movimientos · '+fmt(selectedDate);$('dayMoves').innerHTML=items.length?items.map(itemHTML).join(''):'<div class="card empty">No hay movimientos para este día.</div>'}
+function renderMoves(){let all=occurrences('2000-01-01','2100-12-31').sort((a,b)=>b.occDate.localeCompare(a.occDate));if(currentFilter==='income')all=all.filter(x=>x.type==='income');if(currentFilter==='expense')all=all.filter(x=>x.type==='expense');if(currentFilter==='pending')all=all.filter(x=>!x.done);$('allMoves').innerHTML=all.length?all.map(itemHTML).join(''):'<div class="card empty">No hay movimientos en esta sección.</div>'}
+function renderStats(){let now=new Date(),from=localISO(new Date(now.getFullYear(),now.getMonth(),1)),to=localISO(new Date(now.getFullYear(),now.getMonth()+1,0)),a=occurrences(from,to).filter(x=>x.done);$('monthIncome').textContent=money(a.filter(x=>x.type==='income').reduce((s,x)=>s+x.amount,0));$('monthExpense').textContent=money(a.filter(x=>x.type==='expense').reduce((s,x)=>s+x.amount,0));let cats={};a.filter(x=>x.type==='expense').forEach(x=>cats[x.category||'Otros']=(cats[x.category||'Otros']||0)+x.amount);$('categoryStats').innerHTML=Object.keys(cats).length?Object.entries(cats).sort((a,b)=>b[1]-a[1]).map(([k,v])=>`<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #edf1ee"><span>${esc(k)}</span><b>${money(v)}</b></div>`).join(''):'<div class="muted">Aún no hay gastos confirmados este mes.</div>'}
+function confirmOccurrence(id,date){let e=entries.find(x=>x.id===id);if(!e)return;if(!e.completedDates)e.completedDates=[];if(!e.completedDates.includes(date))e.completedDates.push(date);save()}
+function openForm(type){$('movementForm').reset();$('editId').value='';$('type').value=type;$('date').value=today();$('status').value='pending';$('recurring').value='no';$('cycleFields').classList.add('hidden');$('formTitle').textContent=type==='income'?'Agregar ingreso':'Agregar gasto';toggleType();$('modal').classList.add('show')}
+function closeForm(){$('modal').classList.remove('show')}
+function toggleType(){$('categoryWrap').classList.toggle('hidden',$('type').value==='income')}
+$('type').addEventListener('change',toggleType);
+$('recurring').addEventListener('change',()=>$('cycleFields').classList.toggle('hidden',$('recurring').value!=='yes'));
+$('frequency').addEventListener('change',()=>{let f=$('frequency').value;$('monthlyDays').classList.toggle('hidden',!(f==='monthly'||f==='biweekly'));$('weeklyDays').classList.toggle('hidden',f!=='weekly');$('dailyDays').classList.toggle('hidden',f!=='daily')});
+$('weekChecks').innerHTML=['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'].map((d,i)=>`<label class="check"><input type="checkbox" value="${i}">${d}</label>`).join('');
+function editEntry(id){let e=entries.find(x=>x.id===id);if(!e)return;openForm(e.type);$('editId').value=id;$('formTitle').textContent='Editar movimiento';$('name').value=e.name;$('amount').value=e.amount;$('date').value=e.date;$('category').value=e.category||'Otros';$('priority').value=e.priority;$('recurring').value=e.recurring?'yes':'no';$('cycleFields').classList.toggle('hidden',!e.recurring);$('frequency').value=e.frequency||'monthly';$('frequency').dispatchEvent(new Event('change'));$('monthDays').value=(e.monthDays||[]).join(', ');$('everyDays').value=e.everyDays||1;$('endDate').value=e.endDate||'';$('status').value=e.status||'pending';document.querySelectorAll('#weekChecks input').forEach(c=>c.checked=(e.weekDays||[]).includes(+c.value))}
+$('movementForm').addEventListener('submit',ev=>{ev.preventDefault();let id=$('editId').value,rec=$('recurring').value==='yes',freq=$('frequency').value,days=$('monthDays').value.split(',').map(x=>parseInt(x.trim(),10)).filter(x=>x>=1&&x<=31),week=[...document.querySelectorAll('#weekChecks input:checked')].map(x=>+x.value);let obj={id:id||String(Date.now()),type:$('type').value,name:$('name').value.trim(),amount:+$('amount').value,date:$('date').value,category:$('category').value,priority:$('priority').value,recurring:rec,frequency:rec?freq:'none',monthDays:rec&&(freq==='monthly'||freq==='biweekly')?(days.length?days:[+$('date').value.slice(-2)]):[],weekDays:week,everyDays:+$('everyDays').value||1,endDate:$('endDate').value,status:$('status').value,completedDates:[]};if(rec&&freq==='weekly'&&!week.length){alert('Selecciona al menos un día de la semana.');return}if(rec&&(freq==='monthly'||freq==='biweekly')&&!obj.monthDays.length){alert('Escribe al menos un día del mes.');return}if(id){let old=entries.find(x=>x.id===id);obj.completedDates=old?.completedDates||[];entries=entries.map(x=>x.id===id?obj:x)}else{if(obj.status==='done')obj.completedDates=[obj.date];entries.push(obj)}closeForm();save()});
+document.querySelectorAll('nav button').forEach(b=>b.addEventListener('click',()=>showView(b.dataset.view)));
+function showView(id){['homeView','movesView','calendarView','statsView'].forEach(v=>$(v).classList.toggle('hidden',v!==id));document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('active',b.dataset.view===id));if(id==='calendarView')renderDay();if(id==='movesView')renderMoves()}
+document.querySelectorAll('#moveFilters button').forEach(b=>b.addEventListener('click',()=>{currentFilter=b.dataset.filter;document.querySelectorAll('#moveFilters button').forEach(x=>x.classList.toggle('active',x===b));renderMoves()}));
+render();
+</script>
+</body></html>
